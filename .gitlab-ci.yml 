@@ -1,0 +1,3 @@
+include:
+  - project: wyssmann/gitlab-templates
+    file: pipelines/tf-modules.yaml
