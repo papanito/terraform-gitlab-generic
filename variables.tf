@@ -11,7 +11,8 @@ Each entry contains
 <li>`access_level`: (Object) object that contains access level</li>
 <li>`approvals_before_merge`: Number) Number of merge request approvals required for merging.>
 </ul>
-**`access_level`**
+
+**Access Config `access_level`**
 
 Object contains a list of string. Valid values are `disabled`, `private`, `enabled`.
 
@@ -35,6 +36,19 @@ Object contains a list of string. Valid values are `disabled`, `private`, `enabl
 <li>`security_and_compliance`: </li>
 <li>`visibility_level`:  Set to public to create a public project. Valid values are `private`, `internal`, `public`.
 <li>`wiki`: Set the wiki access level</li></ul>
+
+**Pipeline config `ci_config` **
+
+<ul><li>`ci_config_path` (String) Custom Path to CI config file.</li>
+<li>`ci_default_git_depth` (Number) Default number of revisions for shallow cloning.</li>
+<li>`ci_delete_pipelines_in_seconds` (Number) Pipelines older than the configured time are deleted.</li>
+<li>`ci_forward_deployment_enabled` (Boolean) When a new deployment job starts, skip older deployment jobs that are still pending.</li>
+<li>`ci_id_token_sub_claim_components` (List of String) Fields included in the sub claim of the ID Token. Accepts an array starting with project_path. The array might also include ref_type and ref. Defaults to ["project_path", "ref_type", "ref"]. Introduced in GitLab 17.10.</li>
+<li>`ci_pipeline_variables_minimum_override_role` (String) The minimum role required to set variables when running pipelines and jobs. Introduced in GitLab 17.1. Valid values are developer, maintainer, owner, no_one_allowed</li>
+<li>`ci_restrict_pipeline_cancellation_role` (String) The role required to cancel a pipeline or job. Premium and Ultimate only. Valid values are `developer`, `maintainer`, `owner`, `no_one_allowed`</li>
+<li>`ci_separated_caches` (Boolean) Use separate caches for protected branches.</li>
+<li>`restrict_user_defined_variables` (Boolean) Allow only users with the Maintainer role to pass user-defined variables when triggering a pipeline.</li>
+</ul>
 
 **Remarks**
 
@@ -72,6 +86,16 @@ EOF
       visibility_level        = string
       wiki                    = string
     })
+    ci_config = optional(object({
+      ci_config_path                              = optional(string)
+      ci_default_git_depth                        = optional(number, 20)
+      ci_delete_pipelines_in_seconds              = optional(number, 31536000)
+      ci_forward_deployment_enabled               = optional(bool, true)
+      ci_restrict_pipeline_cancellation_role      = optional(string, "owner")
+      ci_pipeline_variables_minimum_override_role = optional(string, "no_one_allowed")
+      ci_separated_caches                         = optional(bool, true)
+      restrict_user_defined_variables             = optional(bool, true)
+    }))
     default_branch = optional(string)
     import_url     = optional(string)
     tags           = list(string)
@@ -126,6 +150,7 @@ Each entry contains
 <li>`wiki_access_level`:  (String) The group's wiki access level. Only available on Premium and Ultimate plans. Valid values are disabled, private, enabled.</li>
 <li>`default_branch_protection_defaults`: (Block List, Max: 1) The default branch protection defaults </li>
 <li>``: (Boolean) if the repo shal be created in github.</li><ul>
+
 EOF
   type = map(object({
     name             = optional(string)

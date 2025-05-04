@@ -20,9 +20,6 @@ resource "gitlab_project" "repositories" {
   build_git_strategy                               = "fetch"
   build_timeout                                    = try(each.value.build_timeout, 3600)
   builds_access_level                              = try(each.value.access_level.builds, each.value.access_level.overall)
-  ci_default_git_depth                             = 20
-  ci_forward_deployment_enabled                    = true
-  ci_separated_caches                              = true
   container_registry_access_level                  = try(each.value.access_level.container_registry, each.value.access_level.overall)
   default_branch                                   = try(each.value.default_branch, "main")
   emails_enabled                                   = false
@@ -53,7 +50,6 @@ resource "gitlab_project" "repositories" {
   request_access_enabled                           = try(each.value.request_access_enabled, false)
   requirements_access_level                        = try(each.value.access_level.requirements, each.value.access_level.overall)
   resolve_outdated_diff_discussions                = false
-  restrict_user_defined_variables                  = false
   security_and_compliance_access_level             = try(each.value.access_level.security_and_compliance, each.value.access_level.overall)
   shared_runners_enabled                           = try(each.value.has_sharedruners, true)
   snippets_access_level                            = try(each.value.access_level.snippets, each.value.access_level.overall)
@@ -63,6 +59,18 @@ resource "gitlab_project" "repositories" {
   visibility_level                                 = each.value.access_level.visibility_level
   wiki_access_level                                = try(each.value.access_level.wiki, each.value.access_level.overall)
   wiki_enabled                                     = try(each.value.access_level.wiki == "disabled" ? false : true, each.value.access_level.overall == "disabled" ? false : true)
+
+  ## CI Configuration
+  #ci_delete_pipelines_in_seconds                   = each.value.ci_config.ci_delete_pipelines_in_seconds
+  ci_config_path                              = try(each.value.ci_config.ci_config_path, null)
+  ci_default_git_depth                        = try(each.value.ci_config.ci_default_git_depth, local.defaults.ci_default_git_depth)
+  ci_forward_deployment_enabled               = try(each.value.ci_config.ci_forward_deployment_enabled, local.defaults.ci_forward_deployment_enabled)
+  ci_separated_caches                         = try(each.value.ci_config.ci_separated_caches, local.defaults.ci_separated_caches)
+  ci_restrict_pipeline_cancellation_role      = try(each.value.ci_config.ci_restrict_pipeline_cancellation_role, local.defaults.ci_restrict_pipeline_cancellation_role)
+  ci_pipeline_variables_minimum_override_role = try(each.value.ci_config.ci_pipeline_variables_minimum_override_role, local.defaults.ci_pipeline_variables_minimum_override_role)
+  restrict_user_defined_variables             = try(each.value.ci_config.restrict_user_defined_variables, local.defaults.restrict_user_defined_variables)
+
+
   #http_url_to_repo                                 = "https://gitlab.com/papanito/git-hooks.git"
   #import_url                                       = gitlab_project.git-hooks.http_url_to_repo
   #   mirror                                           = false
