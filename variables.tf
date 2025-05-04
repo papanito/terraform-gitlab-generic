@@ -2,40 +2,43 @@ variable "repositories" {
   description = <<EOF
 List of repositories. The list is written in a "generic" way, so we can use it for gitlab, github, .....
 Each entry contains
-- `description`: Description of the repo
-- `gitlab`: `true` if the repo shal be created in gitlab. Default: `false`
-- `github`: `true` if the repo shal be created in github. Default: `false`
-- `archived`: `true` if repo is marked as archived. Default: `false`
-- `access_level`: object that contains access level
 
-
+<ul><li>`description`: (String)Description of the repo</li>
+<li>`avatar`: (String) File name of the avatar, assoumes it's in a subfolder `resources`</li>
+<li>`gitlab`: (Boolean) if the repo shal be created in gitlab.</li>
+<li>`github`: (Boolean) if the repo shal be created in github.</li>
+<li>`archived`: (Boolean) if repo is marked as archived.</li>
+<li>`access_level`: (Object) object that contains access level</li>
+<li>`approvals_before_merge`: Number) Number of merge request approvals required for merging.>
+</ul>
 **`access_level`**
 
 Object contains a list of string. Valid values are `disabled`, `private`, `enabled`.
 
-- `overall`: If specific setting below no defined, this setting is taken
-- `analytics`: Set the analytics access level. 
-- `builds`: Set the builds access level.
-- `container_registry`: Set visibility of container registry, for this project
-- `environments`: Set the environments access level
-- `feature_flags`: Set the feature flags access level
-- `forking`: Set the forking access level.
-- `infrastructure`: Set the infrastructure access level
-- `issues`: Enable issue tracking for the project
-- `merge_requests`: Set the merge requests access level
-- `monitor`: Set the monitor access level. 
-- `packages`: Enable packages repository for the project
-- `pages`: Enable pages access control. 
-- `releases`: Set the releases access level.
-- `repository`: Set the repository access level.
-- `requirements`: Set the requirements access level
-- `snippets`: ) Set the snippets access level.
-- `security_and_compliance`: 
-- `visibility_level`:  Set to public to create a public project. Valid values are `private`, `internal`, `public`.
-- `wiki`: Set the wiki access level
+<ul><li>`overall`: If specific setting below no specified, this setting is taken</li>
+<li>`analytics`: Set the analytics access level. </li>
+<li>`builds`: Set the builds access level.</li>
+<li>`container_registry`: Set visibility of container registry, for this project</li>
+<li>`environments`: Set the environments access level</li>
+<li>`feature_flags`: Set the feature flags access level</li>
+<li>`forking`: Set the forking access level.</li>
+<li>`infrastructure`: Set the infrastructure access level</li>
+<li>`issues`: Enable issue tracking for the project</li>
+<li>`merge_requests`: Set the merge requests access level</li>
+<li>`monitor`: Set the monitor access level. </li>
+<li>`packages`: Enable packages repository for the project</li>
+<li>`pages`: Enable pages access control. </li>
+<li>`releases`: Set the releases access level.</li>
+<li>`repository`: Set the repository access level.</li>
+<li>`requirements`: Set the requirements access level</li>
+<li>`snippets`: Set the snippets access level.</li>
+<li>`security_and_compliance`: </li>
+<li>`visibility_level`:  Set to public to create a public project. Valid values are `private`, `internal`, `public`.
+<li>`wiki`: Set the wiki access level</li></ul>
 
 **Remarks**
-- `public_jobs` will be set according to `builds` access level
+
+`public_jobs` will be set according to `builds` access level
 
 EOF
   type = map(object({
@@ -69,7 +72,7 @@ EOF
       visibility_level        = string
       wiki                    = string
     })
-    default_branch = optional(string, "main")
+    default_branch = optional(string)
     import_url     = optional(string)
     tags           = list(string)
     }
@@ -85,7 +88,7 @@ EOF
   }
   # validation {
   #   condition     = can(regex("^(master|main)", var.repositories.default_branch))
-  #   error_message = "The default branch is usually 'main' or 'master'."
+  #   error_message = "The<br>Default branch is usually 'main' or 'master'."
   # }
   # validation {
   #   condition     = can(regex("^(ssh|https)://.*", var.repositories.import_url))
@@ -94,7 +97,36 @@ EOF
 }
 
 variable "groups" {
-  description = "List of groups"
+  description = <<EOF
+List of repositories. The list is written in a "generic" way, so we can use it for gitlab, github, .....
+Each entry contains
+
+<ul><li>`description`: (String) Description of the repo</li>
+<li>`avatar`: (String) File name of the avatar, assoumes it's in a subfolder `resources`</li>
+<li>`visibility_level`: (String) Set to public to create a public project. Valid values are `private`, `internal`, `public`.</li>
+<li>`gitlab`: (Boolean) if the repo shal be created in gitlab.</li>
+<li>`github`: (Boolean) if the repo shal be created in github.</li>
+<li>`auto_devops_enabled`: (Boolean)<br>Default to Auto DevOps pipeline for all projects within this group.</li>
+<li>`emails_enabled`: (Boolean) Enable email notifications.</li>
+<li>`default_branch`: (String) Initial<br>Default branch name.</li>
+<li>`extra_shared_runners_minutes_limit`: (Number) Additional CI/CD minutes for this group.</li>
+<li>`two_factor_grace_period`: (Number) Time before Two-factor authentication is enforced (in hours).</li>
+<li>`ip_restriction_ranges`: (List of String) A list of IP addresses or subnet masks to restrict group access. Will be concatenated together into a comma separated string. Only allowed on top level groups.
+<li>`lfs_enabled`: (Boolean) Enable/disable Large File Storage (LFS) for the projects in this group.</li>
+<li>`membership_lock`: (Boolean) Users cannot be added to projects in this group.</li>
+<li>`mentions_disabled`:  (Boolean) Disable the capability of a group from getting mentioned.</li>
+<li>`path`: (String) Override path. This might be necessary to avoid duplication.<br>Default is the keyname of the the group element</li>
+<li>`parent_name`: "key" of the parent group from the group map</li>
+<li>`prevent_forking_outside_group`: (Boolean) When enabled, users can not fork projects from this group to external namespaces.</li>
+<li>`request_access_enabled`: (Boolean) Allow users to request member access.</li>
+<li>`require_two_factor_authentication`: (Boolean) Require all users in this group to setup Two-factor authentication.</li>
+<li>`share_with_group_lock`: (Boolean) Prevent sharing a project with another group within this group.</li>
+<li>`project_creation_level`: (String) Determine if developers can create projects in the group. Valid values are: `noone`, `owner`, `maintainer`, `developer`.</li>
+<li>`subgroup_creation_level`: String) Allowed to create subgroups. Valid values are: `owner`, `maintainer`.</li>`
+<li>`wiki_access_level`:  (String) The group's wiki access level. Only available on Premium and Ultimate plans. Valid values are disabled, private, enabled.</li>
+<li>`default_branch_protection_defaults`: (Block List, Max: 1) The default branch protection defaults </li>
+<li>``: (Boolean) if the repo shal be created in github.</li><ul>
+EOF
   type = map(object({
     name             = optional(string)
     description      = string
@@ -102,20 +134,21 @@ variable "groups" {
     visibility_level = string
 
     auto_devops_enabled                = optional(bool, false)
-    emails_enabled                     = optional(bool, true)
+    emails_enabled                     = optional(bool, false)
+    default_branch                     = optional(string, "main")
     extra_shared_runners_minutes_limit = optional(number, 0)
     two_factor_grace_period            = optional(number, 24)
+    require_two_factor_authentication  = optional(bool, true)
     ip_restriction_ranges              = optional(list(string), [])
     lfs_enabled                        = optional(bool, true)
-    membership_lock                    = optional(bool, false)
+    membership_lock                    = optional(bool, true)
     mentions_disabled                  = optional(bool, false)
     path                               = optional(string)
     parent_name                        = optional(string, null)
     prevent_forking_outside_group      = optional(bool, false)
     request_access_enabled             = optional(bool, false)
-    require_two_factor_authentication  = optional(bool, true)
     share_with_group_lock              = optional(bool, true)
-    project_creation_level             = string # Determine if developers can create projects in the group.
+    project_creation_level             = optional(string, "owner")
     subgroup_creation_level            = optional(string, "owner")
     wiki_access_level                  = optional(string, "private")
     default_branch_protection_defaults = optional(object({
