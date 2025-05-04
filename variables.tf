@@ -45,7 +45,7 @@ Object contains a list of string. Valid values are `disabled`, `private`, `enabl
 <li>`ci_forward_deployment_enabled` (Boolean) When a new deployment job starts, skip older deployment jobs that are still pending.</li>
 <li>`ci_id_token_sub_claim_components` (List of String) Fields included in the sub claim of the ID Token. Accepts an array starting with project_path. The array might also include ref_type and ref. Defaults to ["project_path", "ref_type", "ref"]. Introduced in GitLab 17.10.</li>
 <li>`ci_pipeline_variables_minimum_override_role` (String) The minimum role required to set variables when running pipelines and jobs. Introduced in GitLab 17.1. Valid values are developer, maintainer, owner, no_one_allowed</li>
-<li>`ci_restrict_pipeline_cancellation_role` (String) The role required to cancel a pipeline or job. Premium and Ultimate only. Valid values are `developer`, `maintainer`, `owner`, `no_one_allowed`</li>
+<li>`ci_restrict_pipeline_cancellation_role` (String) The role required to cancel a pipeline or job. Premium and Ultimate only. Valid values are `developer`, `maintainer`, `no one`</li>
 <li>`ci_separated_caches` (Boolean) Use separate caches for protected branches.</li>
 <li>`restrict_user_defined_variables` (Boolean) Allow only users with the Maintainer role to pass user-defined variables when triggering a pipeline.</li>
 </ul>
@@ -91,7 +91,7 @@ EOF
       ci_default_git_depth                        = optional(number, 20)
       ci_delete_pipelines_in_seconds              = optional(number, 31536000)
       ci_forward_deployment_enabled               = optional(bool, true)
-      ci_restrict_pipeline_cancellation_role      = optional(string, "owner")
+      ci_restrict_pipeline_cancellation_role      = optional(string, "maintainer")
       ci_pipeline_variables_minimum_override_role = optional(string, "no_one_allowed")
       ci_separated_caches                         = optional(bool, true)
       restrict_user_defined_variables             = optional(bool, true)
@@ -110,6 +110,15 @@ EOF
     ))
     error_message = "All access level elements must be one of disabled, private or enabled"
   }
+
+  # validation {
+  #   condition = alltrue(
+  #     [for project in var.repositories :
+  #       contains(["no one", "maintainer", "developer"], project.ci_config.ci_restrict_pipeline_cancellation_role)
+  #     ]
+  #   )
+  #   error_message = "project_creation_level must be one of these values: no one, maintainer, developer"
+  # }
   # validation {
   #   condition     = can(regex("^(master|main)", var.repositories.default_branch))
   #   error_message = "The<br>Default branch is usually 'main' or 'master'."
