@@ -8,6 +8,7 @@ locals {
     for group in data.gitlab_groups.groups.groups : group.full_path => group
   }
   defaults = {
+    disabled                                    = "disabled"
     ci_default_git_depth                        = 20
     ci_delete_pipelines_in_seconds              = 31536000
     ci_forward_deployment_enabled               = true

@@ -13,7 +13,7 @@ resource "gitlab_project" "repositories" {
   analytics_access_level                           = try(each.value.access_level.analytics, each.value.access_level.overall)
   approvals_before_merge                           = each.value.approvals_before_merge
   archived                                         = try(each.value.archived, false)
-  auto_cancel_pending_pipelines                    = try(each.value.auto_cancel_pending_pipelines, false) ? "disabled" : "enabled"
+  auto_cancel_pending_pipelines                    = try(each.value.auto_cancel_pending_pipelines, false) ? local.defaults.disabled : "enabled"
   auto_devops_deploy_strategy                      = try(each.value.auto_devops_deploy_strategy, "continuous") #"continuous" #continuous, manual, timed_incremental
   auto_devops_enabled                              = try(each.value.auto_devops_enabled, false)
   autoclose_referenced_issues                      = true
@@ -29,13 +29,13 @@ resource "gitlab_project" "repositories" {
   forking_access_level                             = try(each.value.access_level.forking, each.value.access_level.overall)
   infrastructure_access_level                      = try(each.value.access_level.infrastructure, each.value.access_level.overall)
   issues_access_level                              = try(each.value.access_level.issues, each.value.access_level.overall)
-  issues_enabled                                   = try(each.value.access_level.issues == "disabled" ? false : true, each.value.access_level.overall == "disabled" ? false : true)
+  issues_enabled                                   = try(each.value.access_level.issues == local.defaults.disabled ? false : true, each.value.access_level.overall == local.defaults.disabled ? false : true)
   keep_latest_artifact                             = try(each.value.keep_latest_artifact, true)
   lfs_enabled                                      = try(each.value.lfs_enabled, true)
   merge_method                                     = "ff" # merge, rebase_merge, ff
   merge_pipelines_enabled                          = try(each.value.merge_pipelines_enabled, false)
-  merge_requests_access_level                      = try(each.value.access_level.merge_requests, try(each.value.access_level.overall, "disabled"))
-  merge_requests_enabled                           = each.value.access_level.merge_requests == null ? false : (each.value.access_level.merge_requests == "disbled" ? false : true)
+  merge_requests_access_level                      = try(each.value.access_level.merge_requests, try(each.value.access_level.overall, local.defaults.disabled))
+  merge_requests_enabled                           = each.value.access_level.merge_requests == null ? false : (each.value.access_level.merge_requests == local.defaults.disabled ? false : true)
   merge_trains_enabled                             = false
   monitor_access_level                             = try(each.value.access_level.monitor, each.value.access_level.overall)
   mr_default_target_self                           = false
@@ -53,12 +53,12 @@ resource "gitlab_project" "repositories" {
   security_and_compliance_access_level             = try(each.value.access_level.security_and_compliance, each.value.access_level.overall)
   shared_runners_enabled                           = try(each.value.has_sharedruners, true)
   snippets_access_level                            = try(each.value.access_level.snippets, each.value.access_level.overall)
-  snippets_enabled                                 = try(each.value.access_level.snippets == "disabled" ? false : true, each.value.access_level.overall == "disabled" ? false : true)
+  snippets_enabled                                 = try(each.value.access_level.snippets == local.defaults.disabled ? false : true, each.value.access_level.overall == local.defaults.disabled ? false : true)
   squash_option                                    = "default_off"
   import_url                                       = try(each.value.import_url, null)
   visibility_level                                 = each.value.access_level.visibility_level
   wiki_access_level                                = try(each.value.access_level.wiki, each.value.access_level.overall)
-  wiki_enabled                                     = try(each.value.access_level.wiki == "disabled" ? false : true, each.value.access_level.overall == "disabled" ? false : true)
+  wiki_enabled                                     = try(each.value.access_level.wiki == local.defaults.disabled ? false : true, each.value.access_level.overall == local.defaults.disabled ? false : true)
 
   ## CI Configuration
   #ci_delete_pipelines_in_seconds                   = each.value.ci_config.ci_delete_pipelines_in_seconds
