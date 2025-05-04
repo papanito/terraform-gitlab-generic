@@ -96,6 +96,11 @@ EOF
       ci_separated_caches                         = optional(bool, true)
       restrict_user_defined_variables             = optional(bool, true)
     }))
+    labels = optional(map(object({
+      name        = string
+      description = string
+      color       = string
+    })), {})
     default_branch = optional(string)
     import_url     = optional(string)
     tags           = list(string)
@@ -188,7 +193,7 @@ EOF
     default_branch_protection_defaults = optional(object({
       allow_force_push           = bool
       allowed_to_merge           = list(string) # developer, maintainer, no one.
-      allowed_to_push            = list(string) #string # developer, maintainer, no one.
+      allowed_to_push            = list(string) # developer, maintainer, no one.
       developer_can_initial_push = bool
       }),
       {
@@ -197,6 +202,10 @@ EOF
         allowed_to_push            = ["developer", "maintainer"]
         developer_can_initial_push = true
     })
+    labels = optional(map(object({
+      description = string
+      color       = string
+    })), {})
   }))
 
   validation {
