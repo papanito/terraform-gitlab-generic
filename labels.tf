@@ -14,6 +14,7 @@ locals {
       for group_key, group in var.groups : [
         for label_key, label_values in(lookup(group, "labels", {})) :
         {
+          key         = label_key
           name        = label_key
           description = label_values.description
           color       = label_values.color
