@@ -8,6 +8,7 @@ Each entry contains
 <li>`gitlab`: (Boolean) if the repo shal be created in gitlab.</li>
 <li>`github`: (Boolean) if the repo shal be created in github.</li>
 <li>`archived`: (Boolean) if repo is marked as archived.</li>
+<li>`free_tier`: (Boolean) if repo is marked as free-tier, then we ignore features related to licensed versions only.</li>
 <li>`access_level`: (Object) object that contains access level</li>
 <li>`approvals_before_merge`: Number) Number of merge request approvals required for merging.>
 </ul>
@@ -58,6 +59,7 @@ EOF
   type = map(object({
     name                   = optional(string)
     description            = string
+    free_tier              = optional(bool, true)
     group_name             = optional(string)
     avatar                 = optional(string)
     gitlab                 = optional(bool, false)

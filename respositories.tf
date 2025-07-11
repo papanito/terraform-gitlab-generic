@@ -66,7 +66,7 @@ resource "gitlab_project" "repositories" {
   ci_default_git_depth                        = try(each.value.ci_config.ci_default_git_depth, local.defaults.ci_default_git_depth)
   ci_forward_deployment_enabled               = try(each.value.ci_config.ci_forward_deployment_enabled, local.defaults.ci_forward_deployment_enabled)
   ci_separated_caches                         = try(each.value.ci_config.ci_separated_caches, local.defaults.ci_separated_caches)
-  ci_restrict_pipeline_cancellation_role      = try(each.value.ci_config.ci_restrict_pipeline_cancellation_role, local.defaults.ci_restrict_pipeline_cancellation_role)
+  ci_restrict_pipeline_cancellation_role      = each.value.free_tier ? "" : try(each.value.ci_config.ci_restrict_pipeline_cancellation_role, local.defaults.ci_restrict_pipeline_cancellation_role)
   ci_pipeline_variables_minimum_override_role = try(each.value.ci_config.ci_pipeline_variables_minimum_override_role, local.defaults.ci_pipeline_variables_minimum_override_role)
   restrict_user_defined_variables             = try(each.value.ci_config.restrict_user_defined_variables, local.defaults.restrict_user_defined_variables)
 
