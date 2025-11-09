@@ -199,9 +199,9 @@ EOF
       developer_can_initial_push = bool
       }),
       {
-        allow_force_push           = false
+        allow_force_push           = true
         allowed_to_merge           = ["maintainer"]
-        allowed_to_push            = ["developer", "maintainer"]
+        allowed_to_push            = ["maintainer"]
         developer_can_initial_push = true
     })
     labels = optional(map(object({
