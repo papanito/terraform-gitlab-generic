@@ -52,7 +52,6 @@ resource "gitlab_project" "repositories" {
   security_and_compliance_access_level             = try(each.value.access_level.security_and_compliance, each.value.access_level.overall)
   shared_runners_enabled                           = try(each.value.has_sharedruners, true)
   snippets_access_level                            = try(each.value.access_level.snippets, each.value.access_level.overall)
-  snippets_enabled                                 = try(each.value.access_level.snippets == local.defaults.disabled ? false : true, each.value.access_level.overall == local.defaults.disabled ? false : true)
   squash_option                                    = "default_off"
   import_url                                       = try(each.value.import_url, null)
   visibility_level                                 = each.value.access_level.visibility_level
