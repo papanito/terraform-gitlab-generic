@@ -29,7 +29,6 @@ resource "gitlab_project" "repositories" {
   forking_access_level                             = try(each.value.access_level.forking, each.value.access_level.overall)
   infrastructure_access_level                      = try(each.value.access_level.infrastructure, each.value.access_level.overall)
   issues_access_level                              = try(each.value.access_level.issues, each.value.access_level.overall)
-  issues_enabled                                   = try(each.value.access_level.issues == local.defaults.disabled ? false : true, each.value.access_level.overall == local.defaults.disabled ? false : true)
   keep_latest_artifact                             = try(each.value.keep_latest_artifact, true)
   lfs_enabled                                      = try(each.value.lfs_enabled, true)
   merge_method                                     = "ff" # merge, rebase_merge, ff
