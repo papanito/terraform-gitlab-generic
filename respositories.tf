@@ -58,7 +58,6 @@ resource "gitlab_project" "repositories" {
   import_url                                       = try(each.value.import_url, null)
   visibility_level                                 = each.value.access_level.visibility_level
   wiki_access_level                                = try(each.value.access_level.wiki, each.value.access_level.overall)
-  wiki_enabled                                     = try(each.value.access_level.wiki == local.defaults.disabled ? false : true, each.value.access_level.overall == local.defaults.disabled ? false : true)
 
   ## CI Configuration
   #ci_delete_pipelines_in_seconds                   = each.value.ci_config.ci_delete_pipelines_in_seconds
