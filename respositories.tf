@@ -34,7 +34,6 @@ resource "gitlab_project" "repositories" {
   merge_method                                     = "ff" # merge, rebase_merge, ff
   merge_pipelines_enabled                          = try(each.value.merge_pipelines_enabled, false)
   merge_requests_access_level                      = try(each.value.access_level.merge_requests, try(each.value.access_level.overall, local.defaults.disabled))
-  merge_requests_enabled                           = each.value.access_level.merge_requests == null ? false : (each.value.access_level.merge_requests == local.defaults.disabled ? false : true)
   merge_trains_enabled                             = false
   monitor_access_level                             = try(each.value.access_level.monitor, each.value.access_level.overall)
   mr_default_target_self                           = false
