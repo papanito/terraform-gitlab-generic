@@ -41,7 +41,7 @@ resource "gitlab_project" "repositories" {
   mr_default_target_self                           = false
   only_allow_merge_if_all_discussions_are_resolved = try(each.value.only_allow_merge_if_all_discussions_are_resolved, true)
   only_allow_merge_if_pipeline_succeeds            = try(each.value.only_allow_merge_if_pipeline_succeeds, true)
-  packages_enabled                                 = try(each.value.packages_enabled, false)
+  packages_enabled                                 = try(each.value.access_level.packages == "enabled" ? true : false, false)
   pages_access_level                               = try(each.value.access_level.pages, each.value.access_level.overall)
   printing_merge_request_link_enabled              = true
   releases_access_level                            = try(each.value.access_level.releases, each.value.access_level.overall)
