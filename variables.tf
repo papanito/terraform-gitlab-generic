@@ -105,7 +105,7 @@ EOF
     })), {})
     default_branch = optional(string)
     import_url     = optional(string)
-    tags           = list(string)
+    topics         = list(string)
     }
   ))
   validation {

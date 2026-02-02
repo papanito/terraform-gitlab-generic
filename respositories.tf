@@ -72,7 +72,7 @@ resource "gitlab_project" "repositories" {
   #   mirror_overwrites_diverged_branches              = false
   #   mirror_trigger_builds                            = false
   #   only_mirror_protected_branches                   = false
-  topics = try(each.value.tags, [])
+  topics = try(each.value.topics, [])
   container_expiration_policy {
     cadence           = "1d"
     enabled           = false
