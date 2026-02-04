@@ -17,7 +17,7 @@ locals {
 resource "gitlab_project_mirror" "mirrors" {
   for_each = { for m in local.project_mirrors : m.key => m }
 
-  project = module.gitlab.repositories[each.value.project]
+  project = gitlab_project.repositories[each.value.project].id
   url     = each.value.url
   enabled = each.value.enabled
 
