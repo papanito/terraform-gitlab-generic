@@ -111,7 +111,7 @@ EOF
       scm_type                = string
       url                     = string
       keep_divergent_refs     = optional(bool, false)
-      only_protected_branches = optional(bool, false)
+      only_protected_branches = optional(bool, true)
     })), [])
     labels = optional(map(object({
       name        = string
