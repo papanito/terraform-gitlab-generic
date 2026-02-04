@@ -1,7 +1,6 @@
 resource "gitlab_group" "groups" {
   for_each = {
     for key, value in var.groups : key => value
-    #if value.gitlab
   }
   name        = each.value.name == null ? each.key : each.value.name
   description = each.value.parent_name != null ? format("%s [%s]", each.value.description, each.value.parent_name) : each.value.description

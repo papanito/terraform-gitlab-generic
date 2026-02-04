@@ -5,8 +5,6 @@ Each entry contains
 
 <ul><li>`description`: (String)Description of the repo</li>
 <li>`avatar`: (String) File name of the avatar, assoumes it's in a subfolder `resources`</li>
-<li>`gitlab`: (Boolean) if the repo shal be created in gitlab.</li>
-<li>`github`: (Boolean) if the repo shal be created in github.</li>
 <li>`archived`: (Boolean) if repo is marked as archived.</li>
 <li>`free_tier`: (Boolean) if repo is marked as free-tier, then we ignore features related to licensed versions only.</li>
 <li>`access_level`: (Object) object that contains access level</li>
@@ -62,8 +60,6 @@ EOF
     free_tier              = optional(bool, true)
     group_name             = optional(string)
     avatar                 = optional(string)
-    gitlab                 = optional(bool, false)
-    github                 = optional(bool, false)
     archived               = optional(bool, false)
     approvals_before_merge = optional(number, 1)
     access_level = object({

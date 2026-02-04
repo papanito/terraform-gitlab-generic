@@ -1,7 +1,6 @@
 resource "gitlab_project" "repositories" {
   for_each = {
     for key, value in var.repositories : key => value
-    if value.gitlab
   }
   name        = each.value.name == null ? each.key : each.value.name
   description = each.value.description
