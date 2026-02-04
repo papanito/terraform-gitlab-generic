@@ -49,6 +49,16 @@ Object contains a list of string. Valid values are `disabled`, `private`, `enabl
 <li>`restrict_user_defined_variables` (Boolean) Allow only users with the Maintainer role to pass user-defined variables when triggering a pipeline.</li>
 </ul>
 
+** SCM Mirrors `mirrors**
+
+A list of external SCM sources to pull from.
+<ul>
+  <li><b>enabled</b>: If set to true, the mirror will actively synchronize. Defaults to true.</li>
+  <li><b>url</b>: The full authenticated URL of the remote repository.</li>
+  <li><b>keep_divergent_refs</b>: If true, mirroring will not overwrite local changes that have diverged from the source.</li>
+  <li><b>only_protected_branches</b>: If true, only branches protected in the source will be synchronized.</li>
+</ul>
+
 **Remarks**
 
 `public_jobs` will be set according to `builds` access level
@@ -94,6 +104,13 @@ EOF
       ci_separated_caches                         = optional(bool, true)
       restrict_user_defined_variables             = optional(bool, true)
     }))
+    # Mirroring configuration to pull from external SCMs
+    mirrors = optional(list(object({
+      enabled                 = optional(bool, true)
+      url                     = string
+      keep_divergent_refs     = optional(bool, false)
+      only_protected_branches = optional(bool, false)
+    })), [])
     labels = optional(map(object({
       name        = string
       description = string
