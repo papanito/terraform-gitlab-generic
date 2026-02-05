@@ -30,6 +30,7 @@ data "gitlab_group" "resolved" {
 data "gitlab_project_protected_branches" "protected_branches" {
   for_each   = gitlab_project.repositories
   project_id = each.value.id
+  depends_on = [gitlab_branch_protection.rules]
 }
 
 resource "gitlab_project_approval_rule" "rules" {
@@ -52,10 +53,10 @@ resource "gitlab_project_approval_rule" "rules" {
   ]
 
   # Match Branch Names to Protected Branch IDs
-  protected_branch_ids = [
+  protected_branch_ids = flatten([
     for b_name in each.value.branches : [
       for pb in data.gitlab_project_protected_branches.protected_branches[each.value.repo_id].protected_branches : pb.id
       if pb.name == b_name
-    ][0]
-  ]
+    ]
+  ])
 }
