@@ -10,7 +10,7 @@ locals {
         groups             = rule_val.groups
         branches           = rule_val.protected_branches
       }
-    ]
+    ] if repo_val.archived == false # <--- Skip rules if the project is archived
   ])
 }
 
@@ -30,7 +30,6 @@ data "gitlab_group" "resolved" {
 data "gitlab_project_protected_branches" "protected_branches" {
   for_each   = gitlab_project.repositories
   project_id = each.value.id
-  depends_on = [gitlab_branch_protection.rules]
 }
 
 resource "gitlab_project_approval_rule" "rules" {
