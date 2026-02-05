@@ -12,7 +12,6 @@ resource "gitlab_project" "repositories" {
   namespace_id                                     = try(each.value.group_name, null) != null ? local.groups[each.value.group_name].group_id : null
   allow_merge_on_skipped_pipeline                  = false
   analytics_access_level                           = try(each.value.access_level.analytics, each.value.access_level.overall)
-  approvals_before_merge                           = each.value.approvals_before_merge
   auto_cancel_pending_pipelines                    = try(each.value.auto_cancel_pending_pipelines, false) ? local.defaults.disabled : "enabled"
   auto_devops_deploy_strategy                      = try(each.value.auto_devops_deploy_strategy, "continuous") #"continuous" #continuous, manual, timed_incremental
   auto_devops_enabled                              = try(each.value.auto_devops_enabled, false)
