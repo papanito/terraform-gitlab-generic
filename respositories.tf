@@ -2,11 +2,21 @@ resource "gitlab_project" "repositories" {
   for_each = {
     for key, value in var.repositories : key => value
   }
-  name           = each.value.name == null ? each.key : each.value.name
-  description    = each.value.description
-  archived       = try(each.value.archived, false)
-  avatar         = try("./resources/${each.value.avatar}", null)
-  avatar_hash    = try(filesha256("./resources/${each.value.avatar}"), null)
+  name        = each.value.name == null ? each.key : each.value.name
+  description = each.value.description
+  archived    = try(each.value.archived, false)
+  # Safely check for the key and file existence
+  avatar = (
+    lookup(each.value, "avatar", null) != null ?
+    (fileexists("./resources/${each.value.avatar}") ? "./resources/${each.value.avatar}" : null)
+    : null
+  )
+
+  avatar_hash = (
+    lookup(each.value, "avatar", null) != null ?
+    (fileexists("./resources/${each.value.avatar}") ? filesha256("./resources/${each.value.avatar}") : null)
+    : null
+  )
   default_branch = try(each.value.default_branch, "main")
   topics         = try(each.value.topics, [])
 

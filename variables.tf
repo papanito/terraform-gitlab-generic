@@ -80,7 +80,7 @@ EOF
     description = string
     free_tier   = optional(bool, true)
     group_name  = optional(string)
-    tar         = optional(string)
+    avatar      = optional(string)
     archived    = optional(bool, false)
     import_url  = optional(string)
     access_level = object({
