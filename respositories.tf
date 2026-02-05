@@ -2,16 +2,17 @@ resource "gitlab_project" "repositories" {
   for_each = {
     for key, value in var.repositories : key => value
   }
-  name        = each.value.name == null ? each.key : each.value.name
-  description = each.value.description
+  name           = each.value.name == null ? each.key : each.value.name
+  description    = each.value.description
+  archived       = try(each.value.archived, false)
+  avatar         = try("./resources/${each.value.avatar}", null)
+  avatar_hash    = try(filesha256("./resources/${each.value.avatar}"), null)
+  default_branch = try(each.value.default_branch, "main")
 
-  avatar                                           = try("./resources/${each.value.avatar}", null)
-  avatar_hash                                      = try(filesha256("./resources/${each.value.avatar}"), null)
   namespace_id                                     = try(each.value.group_name, null) != null ? local.groups[each.value.group_name].group_id : null
   allow_merge_on_skipped_pipeline                  = false
   analytics_access_level                           = try(each.value.access_level.analytics, each.value.access_level.overall)
   approvals_before_merge                           = each.value.approvals_before_merge
-  archived                                         = try(each.value.archived, false)
   auto_cancel_pending_pipelines                    = try(each.value.auto_cancel_pending_pipelines, false) ? local.defaults.disabled : "enabled"
   auto_devops_deploy_strategy                      = try(each.value.auto_devops_deploy_strategy, "continuous") #"continuous" #continuous, manual, timed_incremental
   auto_devops_enabled                              = try(each.value.auto_devops_enabled, false)
@@ -20,7 +21,6 @@ resource "gitlab_project" "repositories" {
   build_timeout                                    = try(each.value.build_timeout, 3600)
   builds_access_level                              = try(each.value.access_level.builds, each.value.access_level.overall)
   container_registry_access_level                  = try(each.value.access_level.container_registry, each.value.access_level.overall)
-  default_branch                                   = try(each.value.default_branch, "main")
   emails_enabled                                   = false
   environments_access_level                        = try(each.value.access_level.environments, each.value.access_level.overall)
   feature_flags_access_level                       = try(each.value.access_level.feature_flags, each.value.access_level.overall)

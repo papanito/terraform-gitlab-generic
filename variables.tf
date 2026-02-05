@@ -2,7 +2,7 @@ variable "repositories" {
   description = <<EOF
 List of repositories. The list is written in a "generic" way, so we can use it for gitlab, github, .....
 Each entry contains
-
+§
 <ul><li>`description`: (String)Description of the repo</li>
 <li>`avatar`: (String) File name of the avatar, assoumes it's in a subfolder `resources`</li>
 <li>`archived`: (Boolean) if repo is marked as archived.</li>
@@ -60,19 +60,29 @@ A list of external SCM sources to pull from.
   <li><b>only_protected_branches</b>: If true, only branches protected in the source will be synchronized.</li>
 </ul>
 
-**Remarks**
+
+**`approval_rules` **
+
+Map of approval rule configurations.
+- project: (Required) The name or id of the project.
+- approvals_required: (Required) Number of approvals needed.
+- users: (Optional) List of GitLab usernames to resolve to IDs.
+- groups: (Optional) List of GitLab group paths to resolve to IDs.
+- protected_branches: (Optional) List of branch names to resolve to IDs.
+
+  **Remarks**
 
 `public_jobs` will be set according to `builds` access level
 
 EOF
   type = map(object({
-    name                   = optional(string)
-    description            = string
-    free_tier              = optional(bool, true)
-    group_name             = optional(string)
-    avatar                 = optional(string)
-    archived               = optional(bool, false)
-    approvals_before_merge = optional(number, 1)
+    name        = optional(string)
+    description = string
+    free_tier   = optional(bool, true)
+    group_name  = optional(string)
+    tar         = optional(string)
+    archived    = optional(bool, false)
+    import_url  = optional(string)
     access_level = object({
       overall                 = string
       analytics               = string
@@ -95,6 +105,12 @@ EOF
       visibility_level        = string
       wiki                    = string
     })
+    approval_rules = map(object({
+      approvals_required = optional(number, 0)
+      users              = optional(list(string), [])
+      groups             = optional(list(string), [])
+      protected_branches = optional(list(string), [])
+    }))
     ci_config = optional(object({
       ci_config_path                              = optional(string)
       ci_default_git_depth                        = optional(number, 20)
@@ -119,7 +135,6 @@ EOF
       color       = string
     })), {})
     default_branch = optional(string)
-    import_url     = optional(string)
     topics         = list(string)
     }
   ))
