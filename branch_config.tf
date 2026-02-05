@@ -59,3 +59,33 @@ resource "gitlab_project_approval_rule" "rules" {
     ]
   ])
 }
+
+
+locals {
+  flat_branches = flatten([
+    for repo_key, repo_val in local.gitlab_repositories : [
+      # We iterate over the branches defined in the approval rules
+      # (Or you can iterate over a dedicated 'protected_branches' variable)
+      for rule_name, rule_val in repo_val.approval_rules : [
+        for branch_name in rule_val.protected_branches : {
+          repo_key    = repo_key
+          branch_name = branch_name
+        }
+      ]
+    ]
+  ])
+}
+
+resource "gitlab_branch_protection" "this" {
+  for_each = {
+    for b in local.flat_branches : "${b.repo_key}.${b.branch_name}" => b
+  }
+
+  project = gitlab_project.repositories[each.value.repo_key].id
+  branch  = each.value.branch_name
+
+  push_access_level      = "maintainer"
+  merge_access_level     = "developer"
+  unprotect_access_level = "maintainer"
+}
+
