@@ -5,6 +5,7 @@ resource "gitlab_project" "repositories" {
   name        = each.value.name == null ? each.key : each.value.name
   description = each.value.description
   archived    = try(each.value.archived, false)
+
   # Safely check for the key and file existence
   avatar = (
     lookup(each.value, "avatar", null) != null ?
@@ -20,7 +21,8 @@ resource "gitlab_project" "repositories" {
   default_branch = try(each.value.default_branch, "main")
   topics         = try(each.value.topics, [])
 
-  namespace_id = try(each.value.group_name, null) != null ? local.groups[each.value.group_name].group_id : null
+  namespace_id = try(local.groups[each.value.group_name].group_id, null)
+  #namespace_id = try(each.value.group_name, null) != null ? local.groups[each.value.group_name].group_id : null
 
   # access_level
   analytics_access_level               = try(each.value.access_level.analytics, each.value.access_level.overall)

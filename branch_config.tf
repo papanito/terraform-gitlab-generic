@@ -1,40 +1,35 @@
 locals {
-  # Flatten the map so we can iterate at the rule level
+  # Flatten the rules (ensure the typo is fixed here!)
   flat_rules = flatten([
-    for repo_key, repo_val in var.repositories : [
+    for repo_name, repo_val in var.repositories : [
       for rule_name, rule_val in repo_val.approval_rules : {
-        repo_id            = repo_key
+        repo_name          = repo_name
+        repo_id            = gitlab_project.repositories[repo_name].id
         rule_name          = rule_name
         approvals_required = rule_val.approvals_required
         users              = rule_val.users
         groups             = rule_val.groups
-        branches           = rule_val.protected_branches
+        protected_branches = try(rule_val.protected_branches, ["main"])
+        allow_force_push   = rule_val.allow_force_push
       }
-    ] if repo_val.archived == false # <--- Skip rules if the project is archived
+    ] if try(repo_val.archived, false) == false
   ])
-}
 
-# Lookup unique users across all repositories
-data "gitlab_user" "resolved" {
-  for_each = toset(flatten([for r in local.flat_rules : r.users]))
-  username = each.value
-}
-
-# Lookup unique groups across all repositories
-data "gitlab_group" "resolved" {
-  for_each  = toset(flatten([for r in local.flat_rules : r.groups]))
-  full_path = each.value
-}
-
-# Lookup protected branches for each repository
-data "gitlab_project_protected_branches" "protected_branches" {
-  for_each   = gitlab_project.repositories
-  project_id = each.value.id
+  # Extract EVERY branch mentioned in the rules to ensure they get protected
+  flat_protected_branches = distinct(flatten([
+    for r in local.flat_rules : [
+      for b_name in r.protected_branches : {
+        repo_id     = r.repo_id
+        repo_name   = r.repo_name
+        branch_name = b_name
+      }
+    ]
+  ]))
 }
 
 resource "gitlab_project_approval_rule" "rules" {
   for_each = {
-    for r in local.flat_rules : "${r.repo_id}.${r.rule_name}" => r
+    for r in local.flat_rules : "${r.repo_name}.${r.rule_name}" => r
   }
 
   project            = each.value.repo_id
@@ -51,11 +46,50 @@ resource "gitlab_project_approval_rule" "rules" {
     for g in each.value.groups : data.gitlab_group.resolved[g].id
   ]
 
-  # Match Branch Names to Protected Branch IDs
   protected_branch_ids = flatten([
-    for b_name in each.value.branches : [
-      for pb in data.gitlab_project_protected_branches.protected_branches[each.value.repo_id].protected_branches : pb.id
-      if pb.name == b_name
+    for b_name in each.value.protected_branches : [
+      for pb in try(data.gitlab_project_protected_branches.existing[each.value.repo_id].protected_branches, []) :
+      tonumber(pb.id) if pb.name == b_name
     ]
   ])
 }
+
+resource "gitlab_branch_protection" "managed" {
+  for_each = {
+    for b in local.flat_protected_branches : "${b.repo_name}/${b.branch_name}" => b
+  }
+  project = gitlab_project.repositories[each.value.repo_name].id
+  branch  = each.value.branch_name
+
+  push_access_level      = "maintainer" # TODO
+  merge_access_level     = "developer"  # TODO
+  unprotect_access_level = "maintainer" # TODO
+  allow_force_push       = false
+}
+
+output "flat_rules" {
+  value = local.flat_rules
+}
+
+output "flat_protected_branches" {
+  value = local.flat_protected_branches
+}
+
+# Lookup unique users across all repositories
+data "gitlab_user" "resolved" {
+  for_each = toset(flatten([for r in local.flat_rules : r.users]))
+  username = each.value
+}
+
+# Lookup unique groups across all repositories
+data "gitlab_group" "resolved" {
+  for_each  = toset(flatten([for r in local.flat_rules : r.groups]))
+  full_path = each.value
+}
+
+# Lookup protected branches for each repository
+data "gitlab_project_protected_branches" "existing" {
+  for_each   = gitlab_project.repositories
+  project_id = each.value.id
+}
+
