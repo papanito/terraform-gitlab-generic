@@ -69,9 +69,9 @@ resource "gitlab_project_approval_rule" "rules" {
 
 resource "gitlab_branch_protection" "managed" {
   for_each = {
-    for b in local.flat_protected_branches : "${b.repo_key}/${b.branch_name}" => b
+    for b in local.flat_protected_branches : "${b.repo_id}/${b.branch_name}" => b
   }
-  project = gitlab_project.repositories[each.value.repo_key].id
+  project = gitlab_project.repositories[each.value.repo_id].id
   branch  = each.value.branch_name
 
   push_access_level      = "maintainer" # TODO
