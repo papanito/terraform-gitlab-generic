@@ -1,17 +1,27 @@
 locals {
-  # Flatten the map so we can iterate at the rule level
+  # 1. Flatten the rules (ensure the typo is fixed here!)
   flat_rules = flatten([
-    for repo_key, repo_val in var.repositories : [
+    for repo_id, repo_val in var.repositories : [
       for rule_name, rule_val in repo_val.approval_rules : {
-        repo_id            = repo_key
+        repo_id            = repo_id
         rule_name          = rule_name
         approvals_required = rule_val.approvals_required
         users              = rule_val.users
         groups             = rule_val.groups
-        protected_branches = rule_val.protected_branches
+        protected_branches = try(rule_val.protected_branches, [])
       }
-    ] if repo_val.archived == false # <--- Skip rules if the project is archived
+    ] if try(repo_val.archived, false) == false
   ])
+
+  # 2. Extract EVERY branch mentioned in the rules to ensure they get protected
+  flat_protected_branches = distinct(flatten([
+    for r in local.flat_rules : [
+      for b_name in r.protected_branches : {
+        repo_id     = r.repo_id
+        branch_name = b_name
+      }
+    ]
+  ]))
 }
 
 # Lookup unique users across all repositories
@@ -55,19 +65,6 @@ resource "gitlab_project_approval_rule" "rules" {
     for b_name in each.value.protected_branches :
     gitlab_branch_protection.managed["${each.value.repo_id}/${b_name}"].branch_id
   ]
-}
-
-locals {
-  # Create a flat list of all branches that need protection
-  flat_protected_branches = flatten([
-    for repo_key, repo_config in var.repositories : [
-      # We check if protected_branches exists and iterate over it
-      for branch_name in try(repo_config.protected_branches, []) : {
-        repo_key    = repo_key
-        branch_name = branch_name
-      }
-    ]
-  ])
 }
 
 resource "gitlab_branch_protection" "managed" {
