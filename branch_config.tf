@@ -52,7 +52,7 @@ resource "gitlab_project_approval_rule" "rules" {
   ]
 
   protected_branch_ids = compact(flatten([
-    for b_name in each.value.protected_branches : [
+    for b_name in each.value.branches : [
       for pb in try(data.gitlab_project_protected_branches.existing[each.value.repo_id].protected_branches, []) :
       pb.id if pb.name == b_name
     ]
