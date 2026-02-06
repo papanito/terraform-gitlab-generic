@@ -55,7 +55,7 @@ resource "gitlab_project_approval_rule" "rules" {
     for b_name in each.value.protected_branches : [
       for pb in data.gitlab_project_protected_branches.existing[each.value.repo_id].protected_branches : pb.id if pb.name == b_name
     ][0]
-  ]}
+  ])
 }
 
 # locals {
