@@ -51,11 +51,12 @@ resource "gitlab_project_approval_rule" "rules" {
     for g in each.value.groups : data.gitlab_group.resolved[g].id
   ]
 
-  protected_branch_ids = compact([
-    for b_name in each.value.branches : [
-      for pb in data.gitlab_project_protected_branches.existing[each.value.repo_id].protected_branches : pb.id if pb.name == b_name
-    ][0]
-  ])
+  protected_branch_ids = compact(flatten([
+    for b_name in each.value.protected_branches : [
+      for pb in try(data.gitlab_project_protected_branches.existing[each.value.repo_id].protected_branches, []) :
+      pb.id if pb.name == b_name
+    ]
+  ]))
 }
 
 # locals {
