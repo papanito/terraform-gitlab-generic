@@ -59,29 +59,29 @@ resource "gitlab_project_approval_rule" "rules" {
   ]))
 }
 
-# locals {
-#   # Create a flat list of all branches that need protection
-#   flat_protected_branches = flatten([
-#     for repo_key, repo_config in var.repositories : [
-#       # We check if protected_branches exists and iterate over it
-#       for branch_name in try(repo_config.protected_branches, []) : {
-#         repo_key    = repo_key
-#         branch_name = branch_name
-#       }
-#     ]
-#   ])
-# }
+locals {
+  # Create a flat list of all branches that need protection
+  flat_protected_branches = flatten([
+    for repo_key, repo_config in var.repositories : [
+      # We check if protected_branches exists and iterate over it
+      for branch_name in try(repo_config.protected_branches, []) : {
+        repo_key    = repo_key
+        branch_name = branch_name
+      }
+    ]
+  ])
+}
 
-# resource "gitlab_branch_protection" "branches" {
-#   for_each = {
-#     for b in local.flat_protected_branches : "${b.repo_key}/${b.branch_name}" => b
-#   }
-#   project = gitlab_project.repositories[each.value.repo_key].id
-#   branch  = each.value.branch_name
-#
-#   push_access_level      = "maintainer" # TODO
-#   merge_access_level     = "developer"  # TODO
-#   unprotect_access_level = "maintainer" # TODO
-#   allow_force_push       = false
-# }
+resource "gitlab_branch_protection" "branches" {
+  for_each = {
+    for b in local.flat_protected_branches : "${b.repo_key}/${b.branch_name}" => b
+  }
+  project = gitlab_project.repositories[each.value.repo_key].id
+  branch  = each.value.branch_name
+
+  push_access_level      = "maintainer" # TODO
+  merge_access_level     = "developer"  # TODO
+  unprotect_access_level = "maintainer" # TODO
+  allow_force_push       = false
+}
 
