@@ -8,7 +8,7 @@ locals {
         approvals_required = rule_val.approvals_required
         users              = rule_val.users
         groups             = rule_val.groups
-        branches           = rule_val.protected_branches
+        protected_branches = rule_val.protected_branches
       }
     ] if repo_val.archived == false # <--- Skip rules if the project is archived
   ])
