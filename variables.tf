@@ -2,13 +2,15 @@ variable "repositories" {
   description = <<EOF
 List of repositories. The list is written in a "generic" way, so we can use it for gitlab, github, .....
 Each entry contains
-§
+
 <ul><li>`description`: (String)Description of the repo</li>
 <li>`avatar`: (String) File name of the avatar, assoumes it's in a subfolder `resources`</li>
 <li>`archived`: (Boolean) if repo is marked as archived.</li>
 <li>`free_tier`: (Boolean) if repo is marked as free-tier, then we ignore features related to licensed versions only.</li>
 <li>`access_level`: (Object) object that contains access level</li>
-<li>`approvals_before_merge`: Number) Number of merge request approvals required for merging.>
+<li>`default_branch`: (String) Name of the default branch (`main` if not specified)</li>
+<li>`protected_branches`: (List of Strings) A list of branch names that should be automatically protected upon repository creation e.g. ["main", "master", "production"]</li>
+<li>`topics`: (List of Strings)  A list of tags (topics) to apply to the repository.</li>
 </ul>
 
 **Access Config `access_level`**
@@ -68,7 +70,6 @@ Map of approval rule configurations.
 - approvals_required: (Required) Number of approvals needed.
 - users: (Optional) List of GitLab usernames to resolve to IDs.
 - groups: (Optional) List of GitLab group paths to resolve to IDs.
-- protected_branches: (Optional) List of branch names to resolve to IDs.
 
   **Remarks**
 
@@ -76,13 +77,15 @@ Map of approval rule configurations.
 
 EOF
   type = map(object({
-    name        = optional(string)
-    description = string
-    free_tier   = optional(bool, true)
-    group_name  = optional(string)
-    avatar      = optional(string)
-    archived    = optional(bool, false)
-    import_url  = optional(string)
+    name           = optional(string)
+    description    = string
+    free_tier      = optional(bool, true)
+    group_name     = optional(string)
+    avatar         = optional(string)
+    archived       = optional(bool, false)
+    import_url     = optional(string)
+    default_branch = optional(string)
+    topics         = list(string)
     access_level = object({
       overall                 = string
       analytics               = string
@@ -134,8 +137,6 @@ EOF
       description = string
       color       = string
     })), {})
-    default_branch = optional(string)
-    topics         = list(string)
     }
   ))
   validation {
@@ -174,8 +175,6 @@ Each entry contains
 <ul><li>`description`: (String) Description of the repo</li>
 <li>`avatar`: (String) File name of the avatar, assoumes it's in a subfolder `resources`</li>
 <li>`visibility_level`: (String) Set to public to create a public project. Valid values are `private`, `internal`, `public`.</li>
-<li>`gitlab`: (Boolean) if the repo shal be created in gitlab.</li>
-<li>`github`: (Boolean) if the repo shal be created in github.</li>
 <li>`auto_devops_enabled`: (Boolean)<br>Default to Auto DevOps pipeline for all projects within this group.</li>
 <li>`emails_enabled`: (Boolean) Enable email notifications.</li>
 <li>`default_branch`: (String) Initial<br>Default branch name.</li>
@@ -195,7 +194,6 @@ Each entry contains
 <li>`subgroup_creation_level`: String) Allowed to create subgroups. Valid values are: `owner`, `maintainer`.</li>`
 <li>`wiki_access_level`:  (String) The group's wiki access level. Only available on Premium and Ultimate plans. Valid values are disabled, private, enabled.</li>
 <li>`default_branch_protection_defaults`: (Block List, Max: 1) The default branch protection defaults </li>
-<li>``: (Boolean) if the repo shal be created in github.</li><ul>
 
 EOF
   type = map(object({

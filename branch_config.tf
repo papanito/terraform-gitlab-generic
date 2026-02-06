@@ -51,41 +51,36 @@ resource "gitlab_project_approval_rule" "rules" {
     for g in each.value.groups : data.gitlab_group.resolved[g].id
   ]
 
-  # Match Branch Names to Protected Branch IDs
-  protected_branch_ids = flatten([
-    for b_name in each.value.branches : [
-      for pb in data.gitlab_project_protected_branches.protected_branches[each.value.repo_id].protected_branches : pb.id
-      if pb.name == b_name
-    ]
-  ])
+  protected_branch_ids = compact([
+    for b_name in each.value.protected_branches : [
+      for pb in data.gitlab_project_protected_branches.existing[each.value.repo_id].protected_branches : pb.id if pb.name == b_name
+    ][0]
+  ]}
 }
 
+# locals {
+#   # Create a flat list of all branches that need protection
+#   flat_protected_branches = flatten([
+#     for repo_key, repo_config in var.repositories : [
+#       # We check if protected_branches exists and iterate over it
+#       for branch_name in try(repo_config.protected_branches, []) : {
+#         repo_key    = repo_key
+#         branch_name = branch_name
+#       }
+#     ]
+#   ])
+# }
 
-locals {
-  flat_branches = flatten([
-    for repo_key, repo_val in local.gitlab_repositories : [
-      # We iterate over the branches defined in the approval rules
-      # (Or you can iterate over a dedicated 'protected_branches' variable)
-      for rule_name, rule_val in repo_val.approval_rules : [
-        for branch_name in rule_val.protected_branches : {
-          repo_key    = repo_key
-          branch_name = branch_name
-        }
-      ]
-    ]
-  ])
-}
-
-resource "gitlab_branch_protection" "this" {
-  for_each = {
-    for b in local.flat_branches : "${b.repo_key}.${b.branch_name}" => b
-  }
-
-  project = gitlab_project.repositories[each.value.repo_key].id
-  branch  = each.value.branch_name
-
-  push_access_level      = "maintainer"
-  merge_access_level     = "developer"
-  unprotect_access_level = "maintainer"
-}
+# resource "gitlab_branch_protection" "branches" {
+#   for_each = {
+#     for b in local.flat_protected_branches : "${b.repo_key}/${b.branch_name}" => b
+#   }
+#   project = gitlab_project.repositories[each.value.repo_key].id
+#   branch  = each.value.branch_name
+#
+#   push_access_level      = "maintainer" # TODO
+#   merge_access_level     = "developer"  # TODO
+#   unprotect_access_level = "maintainer" # TODO
+#   allow_force_push       = false
+# }
 
