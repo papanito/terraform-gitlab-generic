@@ -27,7 +27,7 @@ data "gitlab_group" "resolved" {
 }
 
 # Lookup protected branches for each repository
-data "gitlab_project_protected_branches" "protected_branches" {
+data "gitlab_project_protected_branches" "existing" {
   for_each   = gitlab_project.repositories
   project_id = each.value.id
 }
