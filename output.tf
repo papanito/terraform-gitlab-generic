@@ -10,6 +10,6 @@ output "branch_protection_rules" {
 }
 
 output "protected_branches" {
-  value = data.gitlab_project_protected_branches["protected_branches"]
+  value = data.gitlab_project_protected_branches.existing
 }
 
