@@ -61,10 +61,12 @@ resource "gitlab_project_approval_rule" "rules" {
     for g in each.value.groups : data.gitlab_group.resolved[g].id
   ]
 
-  protected_branch_ids = [
-    for b_name in each.value.protected_branches :
-    gitlab_branch_protection.managed["${each.value.repo_id}/${b_name}"].id
-  ]
+  protected_branch_ids = flatten([
+    for b_name in each.value.protected_branches : [
+      for pb in try(data.gitlab_project_protected_branches.existing[each.value.repo_id].protected_branches, []) :
+      tonumber(pb.id) if pb.name == b_name
+    ]
+  ])
 }
 
 resource "gitlab_branch_protection" "managed" {
