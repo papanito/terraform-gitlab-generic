@@ -15,6 +15,6 @@ output "protected_branches" {
 }
 
 output "protected_branches_managed" {
-  value = gitlab_project_protected_branches.managed
+  value = gitlab_branch_protection.managed
 }
 
