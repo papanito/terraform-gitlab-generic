@@ -63,7 +63,7 @@ resource "gitlab_project_approval_rule" "rules" {
 
   protected_branch_ids = [
     for b_name in each.value.protected_branches :
-    gitlab_branch_protection.managed["${each.value.repo_id}/${b_name}"].branch_id
+    gitlab_branch_protection.managed["${each.value.repo_id}/${b_name}"].id
   ]
 }
 
