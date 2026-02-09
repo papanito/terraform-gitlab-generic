@@ -112,7 +112,7 @@ EOF
       approvals_required = optional(number, 0)
       users              = optional(list(string), [])
       groups             = optional(list(string), [])
-      protected_branches = optional(list(string), [])
+      protected_branches = optional(list(string), ["main"])
     }))
     ci_config = optional(object({
       ci_config_path                              = optional(string)
