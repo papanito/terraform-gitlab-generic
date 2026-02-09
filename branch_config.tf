@@ -42,31 +42,46 @@ data "gitlab_project_protected_branches" "existing" {
   project_id = each.value.id
 }
 
-resource "gitlab_project_approval_rule" "rules" {
-  for_each = {
-    for r in local.flat_rules : "${r.repo_id}.${r.rule_name}" => r
+# resource "gitlab_project_approval_rule" "rules" {
+#   for_each = {
+#     for r in local.flat_rules : "${r.repo_id}.${r.rule_name}" => r
+#   }
+#
+#   project            = each.value.repo_id
+#   name               = each.value.rule_name
+#   approvals_required = each.value.approvals_required
+#
+#   # Convert Usernames to IDs via the data source map
+#   user_ids = [
+#     for u in each.value.users : data.gitlab_user.resolved[u].id
+#   ]
+#
+#   # Convert Group Paths to IDs via the data source map
+#   group_ids = [
+#     for g in each.value.groups : data.gitlab_group.resolved[g].id
+#   ]
+#
+#   protected_branch_ids = flatten([
+#     for b_name in each.value.protected_branches : [
+#       for pb in try(data.gitlab_project_protected_branches.existing[each.value.repo_id].protected_branches, []) :
+#       tonumber(pb.id) if pb.name == b_name
+#     ]
+#   ])
+# }
+#
+locals {
+  protected_branch_ids = {
+    for r in local.flat_rules : "${r.repo_id}.${r.rule_name}" => flatten([
+      for b_name in r.protected_branches : [
+        for pb in try(data.gitlab_project_protected_branches.existing[r.repo_id].protected_branches, []) :
+        tonumber(pb.id) if pb.name == b_name
+      ]
+    ])
   }
+}
 
-  project            = each.value.repo_id
-  name               = each.value.rule_name
-  approvals_required = each.value.approvals_required
-
-  # Convert Usernames to IDs via the data source map
-  user_ids = [
-    for u in each.value.users : data.gitlab_user.resolved[u].id
-  ]
-
-  # Convert Group Paths to IDs via the data source map
-  group_ids = [
-    for g in each.value.groups : data.gitlab_group.resolved[g].id
-  ]
-
-  protected_branch_ids = flatten([
-    for b_name in each.value.protected_branches : [
-      for pb in try(data.gitlab_project_protected_branches.existing[each.value.repo_id].protected_branches, []) :
-      tonumber(pb.id) if pb.name == b_name
-    ]
-  ])
+output "protected_branch_ids" {
+  value = local.protected_branch_ids
 }
 
 resource "gitlab_branch_protection" "managed" {
