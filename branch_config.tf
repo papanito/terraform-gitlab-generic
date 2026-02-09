@@ -24,6 +24,16 @@ locals {
   ]))
 }
 
+output "debug_flat_rules" {
+  value = {
+    for r in local.flat_rules : "${r.repo_id}.${r.rule_name}" => r.protected_branches
+  }
+}
+
+output "debug_protections" {
+  value = local.flat_protected_branches
+}
+
 # Lookup unique users across all repositories
 data "gitlab_user" "resolved" {
   for_each = toset(flatten([for r in local.flat_rules : r.users]))
