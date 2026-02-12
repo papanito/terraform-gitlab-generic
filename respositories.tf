@@ -69,7 +69,7 @@ resource "gitlab_project" "repositories" {
   resolve_outdated_diff_discussions                = false
   shared_runners_enabled                           = try(each.value.has_sharedruners, true)
   squash_option                                    = "default_off"
-  import_url                                       = try(each.value.import_url, null)
+  import_url                                       = each.value.free_tier ? null : try(each.value.import_url, null)
 
   ## CI Configuration
   #ci_delete_pipelines_in_seconds                   = each.value.ci_config.ci_delete_pipelines_in_seconds
