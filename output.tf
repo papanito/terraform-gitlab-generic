@@ -14,7 +14,3 @@ output "protected_branches" {
   value = data.gitlab_project_protected_branches.existing
 }
 
-# output "protected_branches_managed" {
-#   value = gitlab_branch_protection.managed
-# }
-

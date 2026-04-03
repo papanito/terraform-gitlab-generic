@@ -67,11 +67,13 @@ A list of external SCM sources to pull from.
 
 Map of approval rule configurations.
 <ul>
-<li>- project: (Required) The name or id of the project.</li>
-<li>- approvals_required: (Required) Number of approvals needed.</li>
-<li>- users: (Optional) List of GitLab usernames to resolve to IDs.</li>
-<li>- groups: (Optional) List of GitLab group paths to resolve to IDs.</li>
-<li>- allow_force_push: (Optional) Wether allow forced push</li>
+<li><b>project</b>: (Required) The name or id of the project.</li>
+<li><b>approvals_before_merge_required</b>: (Required) Number of approvals needed.</li>
+<li><b>users</b>: (Optional) List of GitLab usernames to resolve to IDs.</li>
+<li><b>groups</b>: (Optional) List of GitLab group paths to resolve to IDs.</li>
+<li><b>allow_force_push</b>: (Optional) Wether allow forced push</li>
+<li><b>rule_type</b>: (String) String, defaults to `regular`. The type of rule. `any_approver` is a pre-configured default rule with `approvals_required` at `0`. Valid values are `regular`, `any_approver`, `report_approver`</li>
+<li><b>`applies_to_all_protected_branches`<b>: (Boolean) Whether the rule is applied to all protected branches. If set to 'true', the value of protected_branch_ids is ignored. Default is `false?.</li>
 </ul>
 
 **Remarks**
@@ -112,11 +114,13 @@ EOF
       wiki                    = string
     })
     approval_rules = map(object({
-      approvals_required = optional(number, 0)
-      users              = optional(list(string), [])
-      groups             = optional(list(string), [])
-      protected_branches = optional(list(string), ["main"])
-      allow_force_push   = optional(bool, false)
+      applies_to_all_protected_branches = optional(bool, false)
+      approvals_required                = optional(number, 0)
+      users                             = optional(list(string), [])
+      groups                            = optional(list(string), [])
+      protected_branches                = optional(list(string), ["main"])
+      allow_force_push                  = optional(bool, false)
+      rule_type                         = optional(string, null)
     }))
     ci_config = optional(object({
       ci_config_path                              = optional(string)
@@ -195,7 +199,7 @@ Each entry contains
 <li>`require_two_factor_authentication`: (Boolean) Require all users in this group to setup Two-factor authentication.</li>
 <li>`share_with_group_lock`: (Boolean) Prevent sharing a project with another group within this group.</li>
 <li>`project_creation_level`: (String) Determine if developers can create projects in the group. Valid values are: `noone`, `owner`, `maintainer`, `developer`.</li>
-<li>`subgroup_creation_level`: String) Allowed to create subgroups. Valid values are: `owner`, `maintainer`.</li>`
+<li>`subgroup_creation_level`: String) Allowed to create subgroups. Valid values are: `owner`, `maintainer`.</li>
 <li>`wiki_access_level`:  (String) The group's wiki access level. Only available on Premium and Ultimate plans. Valid values are disabled, private, enabled.</li>
 <li>`default_branch_protection_defaults`: (Block List, Max: 1) The default branch protection defaults </li>
 
