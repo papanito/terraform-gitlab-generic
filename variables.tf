@@ -92,26 +92,26 @@ EOF
     default_branch = optional(string)
     topics         = list(string)
     access_level = object({
-      overall                 = string
-      analytics               = string
-      builds                  = string
-      container_registry      = string
-      environments            = string
-      feature_flags           = string
-      forking                 = string
-      infrastructure          = string
-      issues                  = string
-      merge_requests          = string
-      monitor                 = string
-      packages                = string
-      pages                   = string
-      releases                = string
-      repository              = string
-      requirements            = string
-      snippets                = string
-      security_and_compliance = string
-      visibility_level        = string
-      wiki                    = string
+      overall                 = optional(string, null)
+      analytics               = optional(string, null)
+      builds                  = optional(string, null)
+      container_registry      = optional(string, null)
+      environments            = optional(string, null)
+      feature_flags           = optional(string, null)
+      forking                 = optional(string, null)
+      infrastructure          = optional(string, null)
+      issues                  = optional(string, null)
+      merge_requests          = optional(string, null)
+      monitor                 = optional(string, null)
+      packages                = optional(string, null)
+      pages                   = optional(string, null)
+      releases                = optional(string, null)
+      repository              = optional(string, null)
+      requirements            = optional(string, null)
+      snippets                = optional(string, null)
+      security_and_compliance = optional(string, null)
+      visibility_level        = optional(string, null)
+      wiki                    = optional(string, null)
     })
     approval_rules = map(object({
       applies_to_all_protected_branches = optional(bool, false)
@@ -150,8 +150,8 @@ EOF
   validation {
     condition = alltrue(flatten(
       [for repo in var.repositories :
-        [for setting in repo.access_level :
-        contains(["disabled", "private", "enabled", "public"], setting)]
+        [for setting in values(repo.access_level) :
+        contains([null, "disabled", "private", "enabled", "public"], coalesce(setting, "disabled"))]
       ]
     ))
     error_message = "All access level elements must be one of disabled, private or enabled"
@@ -249,7 +249,7 @@ EOF
   validation {
     condition = alltrue(
       [for group in var.groups :
-        contains(["noone", "owner", "maintainer", "developer"], group.project_creation_level)
+        contains(["none", "owner", "maintainer", "developer"], group.project_creation_level)
       ]
     )
     error_message = "project_creation_level must be one of these values: noone, owner, maintainer, developer"

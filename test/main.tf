@@ -1,5 +1,14 @@
 locals {
   repositories = {
+    infrastructure = {
+      description  = "My personal repo"
+      access_level = "private-infrastructure"
+      gitlab = {
+      }
+      topics = [
+        "infrastructure"
+      ]
+    }
     clawfinger = {
       description  = "My personal repo"
       access_level = "minimal-public"
