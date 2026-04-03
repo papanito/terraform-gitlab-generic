@@ -52,10 +52,3 @@ module "gitlab" {
   groups       = local.groups
 }
 
-removed {
-  from = module.gitlab.gitlab_user.users
-
-  lifecycle {
-    destroy = false
-  }
-}

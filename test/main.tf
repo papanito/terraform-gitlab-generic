@@ -23,7 +23,8 @@ locals {
       description  = "Profile Repo"
       access_level = "private-build"
       gitlab = {
-        group_name = "clawfinger-test"
+        group_name     = "clawfinger-test"
+        approval_rules = local.approval_rules["allow_force_push"]
       }
       topics = [
         "profile",
@@ -40,6 +41,15 @@ locals {
         approvals_required = 1
         users              = ["clawfinger"]
         protected_branches = ["main"]
+      }
+    }
+    "allow_force_push" = {
+      "default-branches" = {
+        approvals_required     = 1
+        users                  = ["clawfinger"]
+        protected_branches     = ["main"]
+        allow_force_push       = true
+        unprotect_access_level = "admin"
       }
     }
   }

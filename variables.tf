@@ -73,7 +73,10 @@ Map of approval rule configurations.
 <li><b>groups</b>: (Optional) List of GitLab group paths to resolve to IDs.</li>
 <li><b>allow_force_push</b>: (Optional) Wether allow forced push</li>
 <li><b>rule_type</b>: (String) String, defaults to `regular`. The type of rule. `any_approver` is a pre-configured default rule with `approvals_required` at `0`. Valid values are `regular`, `any_approver`, `report_approver`</li>
-<li><b>`applies_to_all_protected_branches`<b>: (Boolean) Whether the rule is applied to all protected branches. If set to 'true', the value of protected_branch_ids is ignored. Default is `false?.</li>
+<li><b>applies_to_all_protected_branches<b>: (Boolean) Whether the rule is applied to all protected branches. If set to 'true', the value of protected_branch_ids is ignored. Default is `false?.</li>
+<li><b>push_access_level</b>: (String) Access levels allowed to merge. Valid values are: `no one`, `developer`, `maintainer`, `admin`.</li>
+  <li><b>push_access_level</b>: (String) Access levels allowed to push. Valid values are: `no one`, `developer`, `maintainer`, `admin`.</li>
+  <li><b>unprotect_access_level</b>: (String) Access levels allowed to unprotect. Valid values are: `no one`, `developer`, `maintainer`, `admin`.</li>
 </ul>
 
 **Remarks**
@@ -121,6 +124,9 @@ EOF
       protected_branches                = optional(list(string), ["main"])
       allow_force_push                  = optional(bool, false)
       rule_type                         = optional(string, null)
+      push_access_level                 = optional(string, "maintainer")
+      merge_access_level                = optional(string, "developer")
+      unprotect_access_level            = optional(string, "maintainer")
     }))
     ci_config = optional(object({
       ci_config_path                              = optional(string)

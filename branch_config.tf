@@ -3,13 +3,17 @@ locals {
   flat_rules = flatten([
     for repo_name, repo_val in var.repositories : [
       for rule_name, rule_val in repo_val.approval_rules : {
-        repo_name          = repo_name
-        rule_name          = rule_name
-        approvals_required = rule_val.approvals_required
-        users              = rule_val.users
-        groups             = rule_val.groups
-        protected_branches = try(rule_val.protected_branches, ["main"])
-        allow_force_push   = rule_val.allow_force_push
+        repo_name              = repo_name
+        rule_name              = rule_name
+        approvals_required     = rule_val.approvals_required
+        users                  = rule_val.users
+        groups                 = rule_val.groups
+        protected_branches     = try(rule_val.protected_branches, ["main"])
+        allow_force_push       = rule_val.allow_force_push
+        push_access_level      = rule_val.push_access_level
+        merge_access_level     = rule_val.merge_access_level
+        unprotect_access_level = rule_val.unprotect_access_level
+
       }
     ] if try(repo_val.archived, false) == false
   ])
@@ -18,8 +22,12 @@ locals {
   flat_protected_branches = distinct(flatten([
     for r in local.flat_rules : [
       for b_name in r.protected_branches : {
-        repo_name   = r.repo_name
-        branch_name = b_name
+        repo_name              = r.repo_name
+        branch_name            = b_name
+        allow_force_push       = r.allow_force_push
+        push_access_level      = r.push_access_level
+        merge_access_level     = r.merge_access_level
+        unprotect_access_level = r.unprotect_access_level
       }
     ]
   ]))
@@ -60,10 +68,10 @@ resource "gitlab_branch_protection" "managed" {
   project = gitlab_project.repositories[each.value.repo_name].id
   branch  = each.value.branch_name
 
-  push_access_level      = "maintainer" # TODO
-  merge_access_level     = "developer"  # TODO
-  unprotect_access_level = "maintainer" # TODO
-  allow_force_push       = false
+  push_access_level      = each.value.push_access_level
+  merge_access_level     = each.value.merge_access_level
+  unprotect_access_level = each.value.unprotect_access_level
+  allow_force_push       = each.value.allow_force_push
 
   depends_on = [gitlab_project.repositories]
 }
