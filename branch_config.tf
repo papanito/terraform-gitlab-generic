@@ -4,7 +4,6 @@ locals {
     for repo_name, repo_val in var.repositories : [
       for rule_name, rule_val in repo_val.approval_rules : {
         repo_name          = repo_name
-        repo_id            = gitlab_project.repositories[repo_name].id
         rule_name          = rule_name
         approvals_required = rule_val.approvals_required
         users              = rule_val.users
@@ -19,7 +18,6 @@ locals {
   flat_protected_branches = distinct(flatten([
     for r in local.flat_rules : [
       for b_name in r.protected_branches : {
-        repo_id     = r.repo_id
         repo_name   = r.repo_name
         branch_name = b_name
       }
@@ -32,7 +30,7 @@ resource "gitlab_project_approval_rule" "rules" {
     for r in local.flat_rules : "${r.repo_name}.${r.rule_name}" => r
   }
 
-  project            = each.value.repo_id
+  project            = gitlab_project.repositories[each.value.repo_name].id
   name               = each.value.rule_name
   approvals_required = each.value.approvals_required
 
@@ -52,6 +50,7 @@ resource "gitlab_project_approval_rule" "rules" {
       tonumber(pb.id) if pb.name == b_name
     ]
   ])
+  depends_on = [gitlab_project.repositories]
 }
 
 resource "gitlab_branch_protection" "managed" {
@@ -65,14 +64,8 @@ resource "gitlab_branch_protection" "managed" {
   merge_access_level     = "developer"  # TODO
   unprotect_access_level = "maintainer" # TODO
   allow_force_push       = false
-}
 
-output "flat_rules" {
-  value = local.flat_rules
-}
-
-output "flat_protected_branches" {
-  value = local.flat_protected_branches
+  depends_on = [gitlab_project.repositories]
 }
 
 # Lookup unique users across all repositories

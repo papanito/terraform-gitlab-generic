@@ -59,16 +59,3 @@ removed {
     destroy = false
   }
 }
-
-output "flat_rules" {
-  value = module.gitlab.flat_rules
-}
-
-output "flat_protected_branches" {
-  value = module.gitlab.flat_protected_branches
-}
-
-output "debug_protected_branches" {
-  value = module.gitlab.protected_branches
-}
-
