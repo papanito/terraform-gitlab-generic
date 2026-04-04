@@ -36,7 +36,7 @@ resource "gitlab_project" "repositories" {
   merge_requests_access_level          = try(each.value.access_level.merge_requests, try(each.value.access_level.overall, local.defaults.disabled))
   monitor_access_level                 = try(each.value.access_level.monitor, each.value.access_level.overall)
   packages_enabled                     = try(each.value.access_level.packages == "enabled" ? true : false, false)
-  pages_access_level                   = try(each.value.access_level.pages, each.value.access_level.overall)
+  pages_access_level                   = try(each.value.access_level.pages, each.value.access_level.visibility_level == "private" ? "private" : each.value.access_level.visibility_level)
   releases_access_level                = try(each.value.access_level.releases, each.value.access_level.overall)
   repository_access_level              = try(each.value.access_level.repository, each.value.access_level.overall)
   request_access_enabled               = try(each.value.request_access_enabled, false)
