@@ -25,25 +25,34 @@ resource "gitlab_project" "repositories" {
   #namespace_id = try(each.value.group_name, null) != null ? local.groups[each.value.group_name].group_id : null
 
   # access_level
-  analytics_access_level               = try(each.value.access_level.analytics, each.value.access_level.overall)
-  builds_access_level                  = try(each.value.access_level.builds, each.value.access_level.overall)
-  container_registry_access_level      = try(each.value.access_level.container_registry, each.value.access_level.overall)
-  environments_access_level            = try(each.value.access_level.environments, each.value.access_level.overall)
-  feature_flags_access_level           = try(each.value.access_level.feature_flags, each.value.access_level.overall)
-  forking_access_level                 = try(each.value.access_level.forking, each.value.access_level.overall)
-  infrastructure_access_level          = try(each.value.access_level.infrastructure, each.value.access_level.overall)
-  issues_access_level                  = try(each.value.access_level.issues, each.value.access_level.overall)
-  merge_requests_access_level          = try(each.value.access_level.merge_requests, try(each.value.access_level.overall, local.defaults.disabled))
-  monitor_access_level                 = try(each.value.access_level.monitor, each.value.access_level.overall)
-  packages_enabled                     = try(each.value.access_level.packages == "enabled" ? true : false, false)
-  pages_access_level                   = try(each.value.access_level.pages, "disabled")
+  analytics_access_level          = try(each.value.access_level.analytics, each.value.access_level.overall)
+  builds_access_level             = try(each.value.access_level.builds, each.value.access_level.overall)
+  container_registry_access_level = try(each.value.access_level.container_registry, each.value.access_level.overall)
+  environments_access_level       = try(each.value.access_level.environments, each.value.access_level.overall)
+  feature_flags_access_level      = try(each.value.access_level.feature_flags, each.value.access_level.overall)
+  forking_access_level            = try(each.value.access_level.forking, each.value.access_level.overall)
+  infrastructure_access_level     = try(each.value.access_level.infrastructure, each.value.access_level.overall)
+  issues_access_level             = try(each.value.access_level.issues, each.value.access_level.overall)
+  merge_requests_access_level     = try(each.value.access_level.merge_requests, try(each.value.access_level.overall, local.defaults.disabled))
+  monitor_access_level            = try(each.value.access_level.monitor, each.value.access_level.overall)
+  packages_enabled                = try(each.value.access_level.packages == "enabled" ? true : false, false)
+  pages_access_level = (
+    # If Free Tier is enabled, GitLab.com doesn't allow "Private" Pages.
+    each.value.free_tier ? (
+      try(each.value.access_level.pages,
+        (contains(["private", "public"], each.value.access_level.pages) ? "enabled" :
+          (each.value.access_level.visibility_level == "private" ? "enabled" :
+      each.value.access_level.pages)))
+    ) :
+    coalesce(each.value.access_level.pages, "private")
+  )
   releases_access_level                = try(each.value.access_level.releases, each.value.access_level.overall)
   repository_access_level              = try(each.value.access_level.repository, each.value.access_level.overall)
   request_access_enabled               = try(each.value.request_access_enabled, false)
   requirements_access_level            = try(each.value.access_level.requirements, each.value.access_level.overall)
   security_and_compliance_access_level = try(each.value.access_level.security_and_compliance, each.value.access_level.overall)
   snippets_access_level                = try(each.value.access_level.snippets, each.value.access_level.overall)
-  visibility_level                     = each.value.access_level.visibility_level
+  visibility_level                     = try(each.value.access_level.visibility_level, "private")
   wiki_access_level                    = try(each.value.access_level.wiki, each.value.access_level.overall)
 
   # ungrouped
