@@ -20,7 +20,7 @@ resource "gitlab_project" "repositories" {
   )
   default_branch = try(each.value.default_branch, "main")
   topics         = try(each.value.topics, [])
-  tags           = try(each.value.topics, [])
+  tags           = null
 
   namespace_id = try(local.groups[each.value.group_name].group_id, null)
   #namespace_id = try(each.value.group_name, null) != null ? local.groups[each.value.group_name].group_id : null
