@@ -3,7 +3,7 @@ resource "gitlab_group_label" "labels" {
     for key, value in local.group_labels : key => value
   }
   group       = each.value.group
-  name        = each.value.key
+  name        = each.value.name
   description = each.value.description
   color       = each.value.color
 }
@@ -14,8 +14,9 @@ locals {
       for group_key, group in var.groups : [
         for label_key, label_values in(lookup(group, "labels", {})) :
         {
-          key         = "${group_key}::${label_key}"
-          name        = label_key
+          key  = "${group_key}::${label_key}"
+          name = trimprefix(label_key, "${group_key}::")
+          #name        = replace(label_key, "/^(${group_key}::|[^:]+::)/", "")
           description = label_values.description
           color       = label_values.color
           group       = group.parent_name == null ? group_key : "${group.parent_name}/${group_key}"
