@@ -36,7 +36,11 @@ resource "gitlab_project" "repositories" {
   issues_access_level             = try(each.value.access_level.issues, each.value.access_level.overall)
   merge_requests_access_level     = try(each.value.access_level.merge_requests, try(each.value.access_level.overall, local.defaults.disabled))
   monitor_access_level            = try(each.value.access_level.monitor, each.value.access_level.overall)
-  packages_enabled                = try(each.value.access_level.packages == "enabled" ? true : try(each.value.access_level.overall == "enabled" ? true : false))
+  packages_enabled = (
+    try(each.value.access_level.overall, local.defaults.disabled) == "private"
+    ? true
+    : try(each.value.access_level.packages, try(each.value.access_level.overall, local.defaults.disabled)) != "disabled"
+  )
   pages_access_level = (
     # If Free Tier is enabled, GitLab.com doesn't allow "Private" Pages.
     each.value.free_tier ? (
