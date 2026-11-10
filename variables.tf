@@ -90,6 +90,7 @@ EOF
     free_tier      = optional(bool, true)
     group_name     = optional(string)
     path           = optional(string)
+    only_allow_merge_if_pipeline_succeeds = optional(bool, true)
     avatar         = optional(string)
     archived       = optional(bool, false)
     import_url     = optional(string)
