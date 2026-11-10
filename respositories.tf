@@ -3,6 +3,7 @@ resource "gitlab_project" "repositories" {
     for key, value in var.repositories : key => value
   }
   name        = each.value.name == null ? each.key : each.value.name
+  path        = try(each.value.path, null)
   description = each.value.description
   archived    = try(each.value.archived, false)
 
